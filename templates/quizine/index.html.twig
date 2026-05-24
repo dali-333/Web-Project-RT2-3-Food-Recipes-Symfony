@@ -1,0 +1,378 @@
+{% extends 'base.html.twig' %}
+{% block title %}Quizine — Cuisine Quiz{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .quizine-wrap { max-width: 680px; margin: 0 auto; padding: 2rem 1rem; }
+
+    .quiz-card {
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+        margin-bottom: 2rem;
+    }
+    .quiz-img {
+        width: 100%; height: 260px; object-fit: cover;
+    }
+    .quiz-img-placeholder {
+        width: 100%; height: 260px;
+        background: #f0f0f0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 5rem;
+    }
+    .quiz-body { padding: 1.5rem; }
+    .quiz-question { font-size: 1.1rem; color: #555; margin-bottom: 0.25rem; }
+    .quiz-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; color: #1a1a1a; }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    .option-btn {
+        padding: 0.9rem 1rem;
+        border-radius: 14px;
+        border: 2.5px solid #e5e5e5;
+        background: #fafafa;
+        font-size: 1.05rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: transform 0.1s, border-color 0.15s, background 0.15s;
+        text-align: left;
+        display: flex; align-items: center; gap: 0.5rem;
+        color: #1a1a1a;
+    }
+    .option-btn:hover:not(:disabled) {
+        border-color: #ffc107;
+        background: #fffbea;
+        transform: translateY(-2px);
+    }
+    .option-btn:active:not(:disabled) { transform: scale(0.97); }
+    .option-btn.correct {
+        border-color: #28a745 !important;
+        background: #d4edda !important;
+        color: #155724 !important;
+        animation: popIn 0.3s ease;
+    }
+    .option-btn.wrong {
+        border-color: #dc3545 !important;
+        background: #f8d7da !important;
+        color: #721c24 !important;
+        animation: shake 0.4s ease;
+    }
+    .option-btn.reveal {
+        border-color: #28a745 !important;
+        background: #d4edda !important;
+        color: #155724 !important;
+    }
+
+    @keyframes popIn {
+        0%   { transform: scale(0.95); }
+        50%  { transform: scale(1.06); }
+        100% { transform: scale(1); }
+    }
+    @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        20%     { transform: translateX(-8px); }
+        40%     { transform: translateX(8px); }
+        60%     { transform: translateX(-6px); }
+        80%     { transform: translateX(6px); }
+    }
+
+    .feedback-bar {
+        border-radius: 12px;
+        padding: 0.85rem 1.2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: none;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .feedback-bar.correct { background: #d4edda; color: #155724; display: flex; }
+    .feedback-bar.wrong   { background: #f8d7da; color: #721c24; display: flex; }
+
+    .next-btn {
+        width: 100%;
+        padding: 0.9rem;
+        border-radius: 14px;
+        border: none;
+        background: #ffc107;
+        color: #1a1a1a;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: none;
+        transition: background 0.15s, transform 0.1s;
+    }
+    .next-btn:hover { background: #e0a800; transform: translateY(-1px); }
+    .next-btn:active { transform: scale(0.98); }
+
+    .stats-bar {
+        display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+    }
+    .stat-pill {
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        background: #f5f5f5;
+        color: #333;
+        border: 1.5px solid #e5e5e5;
+    }
+    .stat-pill.streak { background: #fff3cd; border-color: #ffc107; color: #856404; }
+    .stat-pill.score  { background: #d4edda; border-color: #28a745; color: #155724; }
+
+    .confetti-wrap {
+        position: fixed; top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        pointer-events: none;
+        z-index: 9999;
+        overflow: hidden;
+    }
+    .confetti-piece {
+        position: absolute;
+        width: 10px; height: 10px;
+        border-radius: 2px;
+        animation: confettiFall linear forwards;
+        top: -20px;
+    }
+    @keyframes confettiFall {
+        0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    .progress-bar-wrap {
+        height: 6px;
+        background: #f0f0f0;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ffc107, #ff9800);
+        border-radius: 10px;
+        transition: width 0.4s ease;
+    }
+
+    .end-screen {
+        text-align: center; padding: 3rem 1rem; display: none;
+    }
+    .end-screen .score-big { font-size: 4rem; font-weight: 800; color: #ffc107; }
+    .end-screen .score-label { font-size: 1.2rem; color: #555; margin-bottom: 1.5rem; }
+
+    #question-number { color: #888; font-size: 0.9rem; margin-bottom: 0.5rem; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="quizine-wrap">
+    <div class="text-center mb-4">
+        <h1 class="fw-bold" style="font-size:2.2rem">🌍 Quizine</h1>
+        <p class="text-muted">Guess the cuisine — no stakes, all vibes.</p>
+    </div>
+
+    <div class="stats-bar" id="stats-bar">
+        <div class="stat-pill score" id="score-pill">✅ 0 correct</div>
+        <div class="stat-pill streak" id="streak-pill">🔥 Streak: 0</div>
+        <div class="stat-pill" id="total-pill">📝 0 / 0</div>
+    </div>
+
+    <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+    </div>
+
+    <div id="quiz-area">
+        <div class="quiz-card" id="quiz-card">
+            <div id="card-image"></div>
+            <div class="quiz-body">
+                <p class="quiz-question">What cuisine is this dish from?</p>
+                <div id="question-number"></div>
+                <h2 class="quiz-title" id="recipe-title"></h2>
+                <div class="options-grid" id="options-grid"></div>
+                <div class="feedback-bar" id="feedback-bar"></div>
+                <button class="next-btn" id="next-btn">Next question →</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="end-screen quiz-card" id="end-screen">
+        <div class="score-big" id="final-score"></div>
+        <div class="score-label" id="final-label"></div>
+        <p class="text-muted mb-4" id="final-streak"></p>
+        <button class="btn btn-warning btn-lg fw-bold px-5" onclick="startQuiz()">Play Again 🔄</button>
+    </div>
+</div>
+
+<div class="confetti-wrap" id="confetti-wrap"></div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+const RECIPES  = {{ recipes|raw }};
+const CUISINES = {{ cuisines|raw }};
+
+let queue = [], current = null, score = 0, streak = 0, bestStreak = 0, answered = 0, total = 0;
+
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function startQuiz() {
+    queue      = shuffle([...RECIPES]);
+    score      = 0; streak = 0; bestStreak = 0; answered = 0;
+    total      = queue.length;
+    document.getElementById('end-screen').style.display  = 'none';
+    document.getElementById('quiz-area').style.display   = 'block';
+    updateStats();
+    nextQuestion();
+}
+
+function nextQuestion() {
+    if (queue.length === 0) { showEnd(); return; }
+    current = queue.pop();
+    answered++;
+    updateStats();
+
+    const correctCuisine = current.cuisine;
+    const wrongs = CUISINES
+        .filter(c => c.name !== correctCuisine)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
+    const options = shuffle([
+        { name: correctCuisine, flag: current.flag, correct: true },
+        ...wrongs.map(c => ({ name: c.name, flag: c.flag, correct: false }))
+    ]);
+
+    {# Image #}
+    const imgDiv = document.getElementById('card-image');
+    if (current.image) {
+        imgDiv.innerHTML = `<img src="/uploads/recipes/${current.image}" class="quiz-img" alt="${current.title}">`;
+    } else {
+        imgDiv.innerHTML = `<div class="quiz-img-placeholder">🍽️</div>`;
+    }
+
+    document.getElementById('recipe-title').textContent  = current.title;
+    document.getElementById('question-number').textContent = `Question ${answered} of ${total}`;
+    document.getElementById('progress-bar').style.width  = ((answered - 1) / total * 100) + '%';
+
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = '';
+    options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className   = 'option-btn';
+        btn.innerHTML   = `<span>${opt.flag}</span><span>${opt.name}</span>`;
+        btn.dataset.correct = opt.correct;
+        btn.onclick     = () => handleAnswer(btn, opt.correct, correctCuisine, options);
+        grid.appendChild(btn);
+    });
+
+    const fb = document.getElementById('feedback-bar');
+    fb.className   = 'feedback-bar';
+    fb.style.display = 'none';
+    document.getElementById('next-btn').style.display = 'none';
+}
+
+function handleAnswer(btn, isCorrect, correctCuisine, options) {
+    const allBtns = document.querySelectorAll('.option-btn');
+    allBtns.forEach(b => b.disabled = true);
+
+    const fb = document.getElementById('feedback-bar');
+
+    if (isCorrect) {
+        btn.classList.add('correct');
+        score++; streak++;
+        if (streak > bestStreak) bestStreak = streak;
+        fb.className = 'feedback-bar correct';
+
+        const msgs = [
+            `🎉 Nailed it! That's ${correctCuisine} cuisine!`,
+            `✅ Correct! ${correctCuisine} — you know your food!`,
+            `🔥 Yes! That's definitely ${correctCuisine}!`,
+            `👌 Spot on! ${correctCuisine} is right!`,
+        ];
+        fb.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+        if (streak >= 3) {
+            fb.textContent += ` 🔥 ${streak} in a row!`;
+        }
+        launchConfetti();
+    } else {
+        btn.classList.add('wrong');
+        streak = 0;
+        allBtns.forEach(b => {
+            if (b.dataset.correct === 'true') b.classList.add('reveal');
+        });
+        fb.className = 'feedback-bar wrong';
+        const wrongMsgs = [
+            `❌ Not quite! It was ${correctCuisine}.`,
+            `😬 Close! The answer was ${correctCuisine}.`,
+            `💀 Nope! That dish is from ${correctCuisine} cuisine.`,
+            `🤔 Tricky one — it was ${correctCuisine}!`,
+        ];
+        fb.textContent = wrongMsgs[Math.floor(Math.random() * wrongMsgs.length)];
+    }
+
+    updateStats();
+    document.getElementById('next-btn').style.display = 'block';
+}
+
+function updateStats() {
+    document.getElementById('score-pill').textContent  = `✅ ${score} correct`;
+    document.getElementById('streak-pill').textContent = `🔥 Streak: ${streak}`;
+    document.getElementById('total-pill').textContent  = `📝 ${answered} / ${total}`;
+}
+
+function showEnd() {
+    document.getElementById('quiz-area').style.display  = 'none';
+    document.getElementById('end-screen').style.display = 'block';
+    document.getElementById('progress-bar').style.width = '100%';
+    const pct = Math.round((score / total) * 100);
+    document.getElementById('final-score').textContent  = `${score} / ${total}`;
+
+    let label = '';
+    if (pct === 100) label = '🏆 Perfect score! You cooked with that!';
+    else if (pct >= 80) label = '🎉 Amazing! Bro almost cooked.';
+    else if (pct >= 60) label = '👍 Not bad!';
+    else if (pct >= 40) label = '🌍 Getting there!';
+    else label = '😅 Don't let bro cook.';
+
+    document.getElementById('final-label').textContent   = label;
+    document.getElementById('final-streak').textContent  = `Best streak: ${bestStreak} 🔥`;
+    launchConfetti(60);
+}
+
+function launchConfetti(count = 30) {
+    const wrap   = document.getElementById('confetti-wrap');
+    const colors = ['#ffc107','#ff5722','#4caf50','#2196f3','#e91e63','#9c27b0','#00bcd4'];
+    for (let i = 0; i < count; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.cssText = `
+            left: ${Math.random() * 100}vw;
+            background: ${colors[Math.floor(Math.random() * colors.length)]};
+            width: ${6 + Math.random() * 8}px;
+            height: ${6 + Math.random() * 8}px;
+            border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+            animation-duration: ${0.9 + Math.random() * 1.2}s;
+            animation-delay: ${Math.random() * 0.4}s;
+        `;
+        wrap.appendChild(piece);
+        piece.addEventListener('animationend', () => piece.remove());
+    }
+}
+
+document.getElementById('next-btn').addEventListener('click', function () {
+    this.style.display = 'none';
+    nextQuestion();
+});
+
+startQuiz();
+</script>
+{% endblock %}
