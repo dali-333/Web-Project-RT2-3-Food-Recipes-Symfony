@@ -8,11 +8,35 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class FavoriteController extends AbstractController
 {
-    #[Route('/favorite', name: 'app_favorite')]
-    public function index(): Response
+    #[Route('/favorites', name: 'app_favorites')]
+    #[IsGranted('ROLE_USER')]
+    public function index(FavoriteRepository $favoriteRepo): Response
     {
-        return $this->render('favorite/index.html.twig', [
+        $favorites = $favoriteRepo->findBy(['user' => $this->getUser()]);
+
+        return $this->render('favorite/list.html.twig', [
             'controller_name' => 'FavoriteController',
+            'favorites' => $favorites,
         ]);
+    }
+
+    #[Route('/favorites/toggle/{id}', name: 'app_favorite_toggle', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function toggle(Recipe $recipe, EntityManagerInterface $em, FavoriteRepository $favoriteRepo): Response
+    {
+        $existing = $favoriteRepo->findOneBy(['user' => $this->getUser(), 'recipe' => $recipe]);
+
+        if ($existing) {
+            $em->remove($existing);
+        } else {
+            $favorite = new Favorite();
+            $favorite->setUser($this->getUser());
+            $favorite->setRecipe($recipe);
+            $favorite->setAddedAt(new \DateTimeImmutable());
+            $em->persist($favorite);
+        }
+        $em->flush();
+
+        return $this->redirectToRoute('app_recipe_show', ['id' => $recipe->getId()]);
     }
 }

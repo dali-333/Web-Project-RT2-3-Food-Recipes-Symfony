@@ -9,10 +9,35 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AdminController extends AbstractController
 {
     #[Route('/admin', name: 'app_admin')]
-    public function index(): Response
+    #[IsGranted('ROLE_ADMIN')]
+    public function dashboard(RecipeRepository $repo): Response
     {
-        return $this->render('admin/index.html.twig', [
+        return $this->render('admin/dashboard.html.twig', [
             'controller_name' => 'AdminController',
+            'recipes' => $repo->findAll(),
+        ]);
+    }
+
+    #[Route('/admin/recipes/new', name: 'app_admin_recipes_new')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function new(Request $request, EntityManagerInterface $em): Response
+    {
+        $recipe = new Recipe();
+        $form = $this->createForm(RecipeType::class, $recipe);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $recipe->setAuthor($this->getUser());
+            $recipe->setCreatedAt(new \DateTimeImmutable());
+            $em->persist($recipe);
+            $em->flush();
+
+            return $this->redirectToRoute('app_admin');
+        }
+
+        return $this->render('admin/recipe_form.html.twig', [
+            'controller_name' => 'AdminController',
+            'form' => $form->createView(),
         ]);
     }
 }

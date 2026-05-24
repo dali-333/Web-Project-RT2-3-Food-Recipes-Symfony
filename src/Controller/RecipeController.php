@@ -8,11 +8,36 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class RecipeController extends AbstractController
 {
-    #[Route('/recipe', name: 'app_recipe')]
-    public function index(): Response
+    #[Route('/recipes', name: 'app_recipes')]
+    public function list(RecipeRepository $repo, Request $request): Response
     {
+        $cuisine = $request->query->get('cuisine');
+        $mealType = $request->query->get('mealType');
+        $difficulty = $request->query->get('difficulty');
+
+        $recipes = $repo->findByFilters($cuisine, $mealType, $difficulty);
+
         return $this->render('recipe/index.html.twig', [
             'controller_name' => 'RecipeController',
+            'recipes' => $recipes,
+        ]);
+    }
+
+    #[Route('/recipes/{id}', name: 'app_recipe_show')]
+    public function show(Recipe $recipe, FavoriteRepository $favoriteRepo): Response
+    {
+        $isFavorited = false;
+        if ($this->getUser()) {
+            $isFavorited = $favoriteRepo->findOneBy([
+                'user' => $this->getUser(),
+                'recipe' => $recipe,
+            ]) !== null;
+        }
+
+        return $this->render('recipe/show.html.twig', [
+            'controller_name' => 'RecipeController',
+            'recipe' => $recipe,
+            'isFavorited' => $isFavorited,
         ]);
     }
 }
