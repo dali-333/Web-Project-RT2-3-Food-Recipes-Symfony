@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ edit ? 'Edit' : 'New' }} Recipe{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow">
+      <div class="card-body p-4">
+        <h2 class="mb-4">{{ edit ? '✏️ Edit Recipe' : '🍳 New Recipe' }}</h2>
+
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label fw-bold">Title</label>
+            {{ form_widget(form.title) }}
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-bold">Description</label>
+            {{ form_widget(form.description) }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Cuisine</label>
+            {{ form_widget(form.cuisine) }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Meal Type</label>
+            {{ form_widget(form.mealType) }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Difficulty</label>
+            {{ form_widget(form.difficulty) }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Prep Time (min)</label>
+            {{ form_widget(form.prepTime) }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Cook Time (min)</label>
+            {{ form_widget(form.cookTime) }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Servings</label>
+            {{ form_widget(form.servings) }}
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-bold">Instructions</label>
+            {{ form_widget(form.instructions) }}
+            <small class="text-muted">Write each step on a new line.</small>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-bold">Recipe Image</label>
+            {{ form_widget(form.imageFile) }}
+            {% if edit and recipe.imageFilename %}
+              <div class="mt-2">
+                <img src="/uploads/recipes/{{ recipe.imageFilename }}" height="80" class="rounded">
+                <small class="text-muted ms-2">Current image</small>
+              </div>
+            {% endif %}
+          </div>
+          <div class="col-12 d-flex gap-2">
+            <button type="submit" class="btn btn-warning fw-bold">
+              {{ edit ? 'Save Changes' : 'Publish Recipe' }}
+            </button>
+            <a href="{{ path('app_admin') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </div>
+        {{ form_end(form) }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

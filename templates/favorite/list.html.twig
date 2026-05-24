@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+{% block title %}My Favorites{% endblock %}
+
+{% block body %}
+<h1 class="mb-4">❤️ My Favorite Recipes</h1>
+
+{% if favorites is empty %}
+  <div class="text-center py-5">
+    <p class="fs-4 text-muted">You haven't saved any favorites yet.</p>
+    <a href="{{ path('app_recipes') }}" class="btn btn-warning">Browse Recipes</a>
+  </div>
+{% else %}
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for fav in favorites %}
+    {% set recipe = fav.recipe %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        {% if recipe.imageFilename %}
+          <img src="/uploads/recipes/{{ recipe.imageFilename }}" class="card-img-top" style="height:180px;object-fit:cover">
+        {% else %}
+          <div class="bg-secondary d-flex align-items-center justify-content-center text-white" style="height:180px;font-size:3rem">🍽️</div>
+        {% endif %}
+        <div class="card-body">
+          <span class="badge bg-warning text-dark">{{ recipe.mealType|capitalize }}</span>
+          <h5 class="card-title mt-1">{{ recipe.title }}</h5>
+          <p class="text-muted small">🌍 {{ recipe.cuisine.name }} · ⏱ {{ recipe.prepTime + recipe.cookTime }} min</p>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <a href="{{ path('app_recipe_show', {id: recipe.id}) }}" class="btn btn-sm btn-warning">View Recipe</a>
+          <form action="{{ path('app_favorite_toggle', {id: recipe.id}) }}" method="POST">
+            <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ recipe.id) }}">
+            <button class="btn btn-sm btn-outline-danger">Remove ❤️</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}
