@@ -57,6 +57,25 @@
               </div>
             {% endif %}
           </div>
+          <div class="col-12">
+            <label class="form-label fw-bold">Ingredients</label>
+            <div id="ingredients-wrapper">
+                {% for ingredientForm in form.recipeIngredients %}
+                <div class="ingredient-row row g-2 mb-2">
+                    <div class="col-5">
+                        {{ form_widget(ingredientForm.ingredientName) }}
+                    </div>
+                    <div class="col-5">
+                        {{ form_widget(ingredientForm.quantity) }}
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-outline-danger w-100 remove-ingredient">✕</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" id="add-ingredient" class="btn btn-outline-secondary btn-sm mt-2">+ Add Ingredient</button>
+        </div>
           <div class="col-12 d-flex gap-2">
             <button type="submit" class="btn btn-warning fw-bold">
               {{ edit ? 'Save Changes' : 'Publish Recipe' }}
@@ -69,4 +88,37 @@
     </div>
   </div>
 </div>
+{% block javascripts %}
+<script>
+const wrapper = document.getElementById('ingredients-wrapper');
+let index = wrapper.querySelectorAll('.ingredient-row').length;
+
+const prototype = {{ form.recipeIngredients.vars.prototype|json_encode|raw }};
+
+document.getElementById('add-ingredient').addEventListener('click', function () {
+    const proto = `
+        <div class="ingredient-row row g-2 mb-2">
+            <div class="col-5">
+                <input type="text" name="recipe[recipeIngredients][${index}][ingredientName]"
+                       class="form-control" placeholder="e.g. Tomato">
+            </div>
+            <div class="col-5">
+                <input type="text" name="recipe[recipeIngredients][${index}][quantity]"
+                       class="form-control" placeholder="e.g. 2 cups">
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-outline-danger w-100 remove-ingredient">✕</button>
+            </div>
+        </div>`;
+    wrapper.insertAdjacentHTML('beforeend', proto);
+    index++;
+});
+
+wrapper.addEventListener('click', function (e) {
+    if (e.target.classList.contains('remove-ingredient')) {
+        e.target.closest('.ingredient-row').remove();
+    }
+});
+</script>
+{% endblock %}
 {% endblock %}

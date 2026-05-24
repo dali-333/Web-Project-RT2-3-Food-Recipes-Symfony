@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Recipe;
 use App\Form\RecipeType;
 use App\Repository\RecipeRepository;
+use App\Entity\Ingredient;
+use App\Repository\IngredientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +28,7 @@ class AdminController extends AbstractController
     }
 
     #[Route('/recipe/new', name: 'app_admin_recipe_new')]
-    public function newRecipe(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
+    public function newRecipe(Request $request, EntityManagerInterface $em, SluggerInterface $slugger, IngredientRepository $ingredientRepository): Response
     {
         $recipe = new Recipe();
         $form = $this->createForm(RecipeType::class, $recipe);
@@ -40,6 +42,24 @@ class AdminController extends AbstractController
                     . '-' . uniqid() . '.' . $imageFile->guessExtension();
                 $imageFile->move($this->getParameter('recipes_images_directory'), $newFilename);
                 $recipe->setImageFilename($newFilename);
+            }
+
+            // Handle ingredients
+            foreach ($form->get('recipeIngredients') as $ingredientForm) {
+                $recipeIngredient = $ingredientForm->getData();
+                $ingredientName = $ingredientForm->get('ingredientName')->getData();
+
+                if (!$ingredientName) continue;
+
+                // Reuse existing ingredient or create new one
+                $ingredient = $ingredientRepository->findOneBy(['name' => $ingredientName])
+                    ?? new Ingredient();
+                $ingredient->setName($ingredientName);
+                $em->persist($ingredient);
+
+                $recipeIngredient->setIngredient($ingredient);
+                $recipeIngredient->setRecipe($recipe);
+                $em->persist($recipeIngredient);
             }
 
             $recipe->setAuthor($this->getUser());
@@ -59,7 +79,7 @@ class AdminController extends AbstractController
     }
 
     #[Route('/recipe/{id}/edit', name: 'app_admin_recipe_edit')]
-    public function editRecipe(Recipe $recipe, Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
+    public function editRecipe(Recipe $recipe, Request $request, EntityManagerInterface $em, IngredientRepository $ingredientRepository, SluggerInterface $slugger): Response
     {
         $form = $this->createForm(RecipeType::class, $recipe);
         $form->handleRequest($request);
@@ -71,6 +91,23 @@ class AdminController extends AbstractController
                     . '-' . uniqid() . '.' . $imageFile->guessExtension();
                 $imageFile->move($this->getParameter('recipes_images_directory'), $newFilename);
                 $recipe->setImageFilename($newFilename);
+            }
+            // Handle ingredients
+            foreach ($form->get('recipeIngredients') as $ingredientForm) {
+                $recipeIngredient = $ingredientForm->getData();
+                $ingredientName = $ingredientForm->get('ingredientName')->getData();
+
+                if (!$ingredientName) continue;
+
+                // Reuse existing ingredient or create new one
+                $ingredient = $ingredientRepository->findOneBy(['name' => $ingredientName])
+                    ?? new Ingredient();
+                $ingredient->setName($ingredientName);
+                $em->persist($ingredient);
+
+                $recipeIngredient->setIngredient($ingredient);
+                $recipeIngredient->setRecipe($recipe);
+                $em->persist($recipeIngredient);
             }
 
             $em->flush();
