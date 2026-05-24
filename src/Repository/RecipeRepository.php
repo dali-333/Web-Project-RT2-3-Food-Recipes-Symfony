@@ -16,6 +16,26 @@ class RecipeRepository extends ServiceEntityRepository
         parent::__construct($registry, Recipe::class);
     }
 
+    public function findByFilters(?int $cuisineId, ?string $mealType, ?string $difficulty): array
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->leftJoin('r.cuisine', 'c')
+            ->addSelect('c')
+            ->orderBy('r.createdAt', 'DESC');
+
+        if ($cuisineId) {
+            $qb->andWhere('c.id = :cuisine')->setParameter('cuisine', $cuisineId);
+        }
+        if ($mealType) {
+            $qb->andWhere('r.mealType = :mealType')->setParameter('mealType', $mealType);
+        }
+        if ($difficulty) {
+            $qb->andWhere('r.difficulty = :difficulty')->setParameter('difficulty', $difficulty);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
 //    /**
 //     * @return Recipe[] Returns an array of Recipe objects
 //     */
