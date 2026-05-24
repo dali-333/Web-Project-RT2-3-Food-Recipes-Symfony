@@ -14,8 +14,28 @@
         </span>
         <hr>
         <p class="text-muted">Member since {{ app.user.createdAt|date('F Y') }}</p>
-        <a href="{{ path('app_favorites') }}" class="btn btn-outline-danger me-2">❤️ My Favorites</a>
-        <a href="{{ path('app_logout') }}" class="btn btn-outline-secondary">Logout</a>
+
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+          <a href="{{ path('app_favorites') }}" class="btn btn-outline-danger">❤️ My Favorites</a>
+          <a href="{{ path('app_profile_edit') }}" class="btn btn-outline-primary">✏️ Edit Profile</a>
+        </div>
+
+        <hr>
+
+        {# Delete account #}
+        <button class="btn btn-sm btn-link text-danger" data-bs-toggle="collapse" data-bs-target="#deleteSection">
+          Delete my account
+        </button>
+        <div class="collapse mt-3" id="deleteSection">
+          <div class="alert alert-danger text-start">
+            <strong>⚠️ This is permanent.</strong> Your account and all data will be deleted.
+            <form action="{{ path('app_profile_delete') }}" method="POST" class="mt-2">
+              <input type="hidden" name="_token" value="{{ csrf_token('delete-account') }}">
+              <button class="btn btn-danger btn-sm w-100">Yes, delete my account</button>
+            </form>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

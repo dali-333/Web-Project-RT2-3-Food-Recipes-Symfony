@@ -14,26 +14,26 @@
 {# Latest Recipes #}
 <h2 class="mb-4">Latest Recipes</h2>
 <div class="row row-cols-1 row-cols-md-3 g-4">
-  {% for recipe in recipes %}
-  <div class="col">
-    <div class="card h-100 shadow-sm">
-      {% if recipe.imageFilename %}
-        <img src="/uploads/recipes/{{ recipe.imageFilename }}" class="card-img-top" style="height:200px;object-fit:cover">
-      {% else %}
-        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height:200px">🍽️</div>
-      {% endif %}
-      <div class="card-body">
-        <span class="badge bg-warning text-dark mb-1">{{ recipe.mealType|capitalize }}</span>
-        <span class="badge bg-info text-dark mb-1">{{ recipe.difficulty|capitalize }}</span>
-        <h5 class="card-title">{{ recipe.title }}</h5>
-        <p class="card-text text-muted">{{ recipe.description|slice(0,80) }}...</p>
-      </div>
-      <div class="card-footer">
-        <a href="{{ path('app_recipe_show', {id: recipe.id}) }}" class="btn btn-warning btn-sm">View Recipe →</a>
-      </div>
-    </div>
-  </div>
-  {% endfor %}
+    {% for recipe in recipes %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                {% if recipe.imageFilename %}
+                    <img src="{{ asset('uploads/recipes/' ~ recipe.imageFilename) }}" class="card-img-top" style="height:200px;object-fit:cover" alt="{{ recipe.title }}">
+                {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height:200px;font-size:3rem">🍽️</div>
+                {% endif %}
+                <div class="card-body">
+                    <span class="badge bg-warning text-dark mb-1">{{ recipe.mealType|capitalize }}</span>
+                    <span class="badge bg-secondary mb-1">{{ recipe.difficulty|capitalize }}</span>
+                    <h5 class="card-title">{{ recipe.title }}</h5>
+                  <p class="card-text text-muted">{{ recipe.description|slice(0,80) }}...</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ path('app_recipe_show', {id: recipe.id}) }}" class="btn btn-warning btn-sm">View Recipe →</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
 </div>
 
 {# Cuisines #}

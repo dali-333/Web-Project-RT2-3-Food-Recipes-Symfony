@@ -33,21 +33,71 @@
 
 <div class="row row-cols-1 row-cols-md-3 g-4">
   {% for recipe in recipes %}
-  <div class="col">
+  <div class="col recipe-card">
     <div class="card h-100 shadow-sm">
+      {% if recipe.imageFilename %}
+        <img src="{{ asset('uploads/recipes/' ~ recipe.imageFilename) }}"
+            class="card-img-top" style="height:180px;object-fit:cover" alt="{{ recipe.title }}">
+      {% else %}
+        <div class="bg-light d-flex align-items-center justify-content-center text-muted"
+            style="height:180px;font-size:3rem">🍽️</div>
+      {% endif %}
       <div class="card-body">
         <span class="badge bg-warning text-dark">{{ recipe.mealType|capitalize }}</span>
         <span class="badge bg-secondary">{{ recipe.difficulty|capitalize }}</span>
-        <h5 class="card-title mt-2">{{ recipe.title }}</h5>
+        <h5 class="card-title mt-2 recipe-title">{{ recipe.title }}</h5>
         <p class="text-muted small">🌍 {{ recipe.cuisine.name }}</p>
-        <p>{{ recipe.description|slice(0,100) }}...</p>
+        <p class="recipe-description">{{ recipe.description|slice(0,100) }}...</p>
       </div>
       <div class="card-footer d-flex justify-content-between align-items-center">
-        <small>⏱ {{ recipe.prepTime + recipe.cookTime }} min | 👤 {{ recipe.servings }} servings</small>
+        <small>⏱ {{ recipe.prepTime + recipe.cookTime }} min · 👤 {{ recipe.servings }} servings</small>
         <a href="{{ path('app_recipe_show', {id: recipe.id}) }}" class="btn btn-sm btn-warning">View →</a>
       </div>
     </div>
   </div>
   {% endfor %}
 </div>
+{% block javascripts %}
+<script>
+const searchInput = document.getElementById('navbar-search-input');
+const cards = document.querySelectorAll('.recipe-card');
+
+// If we're on the recipes page, switch to real-time client-side filtering
+if (searchInput && cards.length > 0) {
+  // Prevent form submit on the recipes page — filter in real time instead
+  document.getElementById('navbar-search-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+  });
+
+  searchInput.addEventListener('input', function () {
+    const query = this.value.toLowerCase().trim();
+
+    cards.forEach(card => {
+      const title = card.querySelector('.recipe-title')?.textContent.toLowerCase() || '';
+      const desc  = card.querySelector('.recipe-description')?.textContent.toLowerCase() || '';
+      const match = title.includes(query) || desc.includes(query);
+      card.style.display = match ? '' : 'none';
+    });
+
+    // Show a "no results" message if all hidden
+    const visible = [...cards].filter(c => c.style.display !== 'none');
+    let noResults = document.getElementById('no-results-msg');
+    if (visible.length === 0) {
+      if (!noResults) {
+        noResults = document.createElement('p');
+        noResults.id = 'no-results-msg';
+        noResults.className = 'text-muted text-center mt-4 col-12';
+        noResults.textContent = 'No recipes match your search.';
+        document.querySelector('.row').appendChild(noResults);
+      }
+    } else if (noResults) {
+      noResults.remove();
+    }
+  });
+
+  // Trigger filtering immediately if there's already a search value in the URL
+  if (searchInput.value) searchInput.dispatchEvent(new Event('input'));
+}
+</script>
+{% endblock %}
 {% endblock %}

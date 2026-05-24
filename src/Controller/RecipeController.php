@@ -18,12 +18,14 @@ final class RecipeController extends AbstractController
         $cuisine = $request->query->get('cuisine');
         $mealType = $request->query->get('mealType');
         $difficulty = $request->query->get('difficulty');
+        $search = $request->query->get('search');
 
-        $recipes = $repo->findByFilters($cuisine, $mealType, $difficulty);
+        $recipes = $repo->findByFilters($cuisine, $mealType, $difficulty, $search);
 
         return $this->render('recipe/list.html.twig', [
             'controller_name' => 'RecipeController',
             'recipes' => $recipes,
+            'search' => $search,
         ]);
     }
 

@@ -22,16 +22,31 @@
         <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ path('app_recipes') }}">Recipes</a></li>
         {% if is_granted('ROLE_USER') %}
-        <li class="nav-item"><a class="nav-link" href="{{ path('app_favorites') }}">❤️ Favorites</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ path('app_favorites') }}">❤️ Favorites</a></li>
         {% endif %}
         {% if is_granted('ROLE_ADMIN') %}
-        <li class="nav-item"><a class="nav-link text-warning" href="{{ path('app_admin') }}">⚙️ Admin</a></li>
+          <li class="nav-item"><a class="nav-link text-warning" href="{{ path('app_admin') }}">⚙️ Admin</a></li>
         {% endif %}
       </ul>
+
+      {# Search bar #}
+      <form class="d-flex me-3" id="navbar-search-form" action="{{ path('app_recipes') }}" method="GET">
+        <input
+          class="form-control form-control-sm me-2"
+          type="search"
+          name="search"
+          id="navbar-search-input"
+          placeholder="Search recipes..."
+          autocomplete="off"
+          value="{{ app.request.query.get('search') }}"
+          style="width:200px">
+        <button class="btn btn-outline-warning btn-sm" type="submit">🔍</button>
+      </form>
+
       <ul class="navbar-nav">
         {% if app.user %}
-            <li class="nav-item"><a class="nav-link" href="{{ path('app_profile') }}">👤 {{ app.user.username }}</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}">Logout</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ path('app_profile') }}">👤 {{ app.user.username }}</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}">Logout</a></li>
         {% else %}
           <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Login</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ path('app_register') }}">Sign Up</a></li>
