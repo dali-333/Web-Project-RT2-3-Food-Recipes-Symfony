@@ -21,7 +21,7 @@ final class RecipeController extends AbstractController
 
         $recipes = $repo->findByFilters($cuisine, $mealType, $difficulty);
 
-        return $this->render('recipe/index.html.twig', [
+        return $this->render('recipe/list.html.twig', [
             'controller_name' => 'RecipeController',
             'recipes' => $recipes,
         ]);

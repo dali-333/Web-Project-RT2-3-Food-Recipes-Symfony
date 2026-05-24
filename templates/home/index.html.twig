@@ -1,20 +1,48 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}FoodieHub — Home{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+{# Hero #}
+<div class="p-5 mb-4 bg-warning rounded-3">
+  <div class="container-fluid py-3">
+    <h1 class="display-5 fw-bold">🍳 Welcome to FoodieHub</h1>
+    <p class="col-md-8 fs-4">Explore hundreds of recipes from chefs around the world.</p>
+    <a href="{{ path('app_recipes') }}" class="btn btn-dark btn-lg">Browse Recipes</a>
+  </div>
+</div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+{# Latest Recipes #}
+<h2 class="mb-4">Latest Recipes</h2>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+  {% for recipe in recipes %}
+  <div class="col">
+    <div class="card h-100 shadow-sm">
+      {% if recipe.imageFilename %}
+        <img src="/uploads/recipes/{{ recipe.imageFilename }}" class="card-img-top" style="height:200px;object-fit:cover">
+      {% else %}
+        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height:200px">🍽️</div>
+      {% endif %}
+      <div class="card-body">
+        <span class="badge bg-warning text-dark mb-1">{{ recipe.mealType|capitalize }}</span>
+        <span class="badge bg-info text-dark mb-1">{{ recipe.difficulty|capitalize }}</span>
+        <h5 class="card-title">{{ recipe.title }}</h5>
+        <p class="card-text text-muted">{{ recipe.description|slice(0,80) }}...</p>
+      </div>
+      <div class="card-footer">
+        <a href="{{ path('app_recipe_show', {id: recipe.id}) }}" class="btn btn-warning btn-sm">View Recipe →</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/dabde/Desktop/Projet Web RT2/Web-Project-RT2-3-Food-Recipes-Symfony/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>C:/Users/dabde/Desktop/Projet Web RT2/Web-Project-RT2-3-Food-Recipes-Symfony/templates/home/index.html.twig</code></li>
-    </ul>
+{# Cuisines #}
+<h2 class="mt-5 mb-3">Browse by Cuisine</h2>
+<div class="d-flex flex-wrap gap-2">
+  {% for cuisine in cuisines %}
+    <a href="{{ path('app_recipes', {cuisine: cuisine.id}) }}" class="btn btn-outline-dark">
+      {{ cuisine.flagEmoji }} {{ cuisine.name }}
+    </a>
+  {% endfor %}
 </div>
 {% endblock %}
