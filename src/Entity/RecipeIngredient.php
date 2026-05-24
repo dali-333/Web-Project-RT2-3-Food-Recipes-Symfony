@@ -64,4 +64,18 @@ class RecipeIngredient
 
         return $this;
     }
+
+    private ?string $ingredientName = null;
+
+    public function getIngredientName(): ?string
+    {
+        // Returns existing value OR falls back to the linked ingredient's name
+        return $this->ingredientName ?? $this->ingredient?->getName();
+    }
+
+    public function setIngredientName(?string $name): static
+    {
+        $this->ingredientName = $name;
+        return $this;
+    }
 }

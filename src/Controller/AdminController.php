@@ -45,13 +45,11 @@ class AdminController extends AbstractController
             }
 
             // Handle ingredients
-            foreach ($form->get('recipeIngredients') as $ingredientForm) {
-                $recipeIngredient = $ingredientForm->getData();
-                $ingredientName = $ingredientForm->get('ingredientName')->getData();
+            foreach ($recipe->getRecipeIngredients() as $recipeIngredient) {
+                $ingredientName = $recipeIngredient->getIngredientName();
 
                 if (!$ingredientName) continue;
 
-                // Reuse existing ingredient or create new one
                 $ingredient = $ingredientRepository->findOneBy(['name' => $ingredientName])
                     ?? new Ingredient();
                 $ingredient->setName($ingredientName);
@@ -93,13 +91,11 @@ class AdminController extends AbstractController
                 $recipe->setImageFilename($newFilename);
             }
             // Handle ingredients
-            foreach ($form->get('recipeIngredients') as $ingredientForm) {
-                $recipeIngredient = $ingredientForm->getData();
-                $ingredientName = $ingredientForm->get('ingredientName')->getData();
+            foreach ($recipe->getRecipeIngredients() as $recipeIngredient) {
+                $ingredientName = $recipeIngredient->getIngredientName();
 
                 if (!$ingredientName) continue;
 
-                // Reuse existing ingredient or create new one
                 $ingredient = $ingredientRepository->findOneBy(['name' => $ingredientName])
                     ?? new Ingredient();
                 $ingredient->setName($ingredientName);

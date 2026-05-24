@@ -14,7 +14,7 @@ class RecipeIngredientType extends AbstractType
     {
         $builder
             ->add('ingredientName', TextType::class, [
-                'mapped' => false,
+                'mapped' => true,
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'e.g. Tomato',

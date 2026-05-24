@@ -93,24 +93,26 @@
 const wrapper = document.getElementById('ingredients-wrapper');
 let index = wrapper.querySelectorAll('.ingredient-row').length;
 
-const prototype = {{ form.recipeIngredients.vars.prototype|json_encode|raw }};
-
 document.getElementById('add-ingredient').addEventListener('click', function () {
-    const proto = `
-        <div class="ingredient-row row g-2 mb-2">
-            <div class="col-5">
-                <input type="text" name="recipe[recipeIngredients][${index}][ingredientName]"
-                       class="form-control" placeholder="e.g. Tomato">
-            </div>
-            <div class="col-5">
-                <input type="text" name="recipe[recipeIngredients][${index}][quantity]"
-                       class="form-control" placeholder="e.g. 2 cups">
-            </div>
-            <div class="col-2">
-                <button type="button" class="btn btn-outline-danger w-100 remove-ingredient">✕</button>
-            </div>
+    const newRow = document.createElement('div');
+    newRow.className = 'ingredient-row row g-2 mb-2';
+    newRow.innerHTML = `
+        <div class="col-5">
+            <input type="text"
+                   name="recipe[recipeIngredients][${index}][ingredientName]"
+                   class="form-control"
+                   placeholder="e.g. Tomato">
+        </div>
+        <div class="col-5">
+            <input type="text"
+                   name="recipe[recipeIngredients][${index}][quantity]"
+                   class="form-control"
+                   placeholder="e.g. 2 cups">
+        </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-outline-danger w-100 remove-ingredient">✕</button>
         </div>`;
-    wrapper.insertAdjacentHTML('beforeend', proto);
+    wrapper.appendChild(newRow);
     index++;
 });
 
