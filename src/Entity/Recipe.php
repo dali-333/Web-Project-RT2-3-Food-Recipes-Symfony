@@ -260,7 +260,6 @@ class Recipe
     public function removeFavorite(Favorite $favorite): static
     {
         if ($this->favorites->removeElement($favorite)) {
-            // set the owning side to null (unless already changed)
             if ($favorite->getRecipe() === $this) {
                 $favorite->setRecipe(null);
             }

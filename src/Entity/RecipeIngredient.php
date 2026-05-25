@@ -69,7 +69,6 @@ class RecipeIngredient
 
     public function getIngredientName(): ?string
     {
-        // Returns existing value OR falls back to the linked ingredient's name
         return $this->ingredientName ?? $this->ingredient?->getName();
     }
 

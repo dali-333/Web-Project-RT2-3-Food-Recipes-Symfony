@@ -48,7 +48,6 @@ class AppFixtures extends Fixture
              ->setPassword($this->hasher->hashPassword($user, 'user123'));
         $manager->persist($user);
 
-        // Helper to create or reuse ingredients
         $ingredientCache = [];
         $getIngredient = function(string $name) use (&$ingredientCache, $manager): Ingredient {
             $key = strtolower($name);

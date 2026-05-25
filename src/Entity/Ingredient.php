@@ -67,7 +67,6 @@ class Ingredient
     public function removeRecipeIngredient(RecipeIngredient $recipeIngredient): static
     {
         if ($this->recipeIngredients->removeElement($recipeIngredient)) {
-            // set the owning side to null (unless already changed)
             if ($recipeIngredient->getIngredient() === $this) {
                 $recipeIngredient->setIngredient(null);
             }
