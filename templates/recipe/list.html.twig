@@ -64,7 +64,7 @@ const cards = document.querySelectorAll('.recipe-card');
 
 // If we're on the recipes page, switch to real-time client-side filtering
 if (searchInput && cards.length > 0) {
-  // Prevent form submit on the recipes page — filter in real time instead
+  // Prevent form submit on the recipes page - filter in real time instead
   document.getElementById('navbar-search-form').addEventListener('submit', function(e) {
     e.preventDefault();
   });

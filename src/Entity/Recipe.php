@@ -59,7 +59,7 @@ class Recipe
     /**
      * @var Collection<int, Favorite>
      */
-    #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'recipe')]
+    #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'recipe', cascade: ['remove'], orphanRemoval: true)]
     private Collection $favorites;
 
     #[ORM\ManyToOne(inversedBy: 'recipes')]

@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Quizine — Cuisine Quiz{% endblock %}
+{% block title %}Quizine - Cuisine Quiz{% endblock %}
 
 {% block stylesheets %}
 <style>
@@ -172,7 +172,7 @@
 <div class="quizine-wrap">
     <div class="text-center mb-4">
         <h1 class="fw-bold" style="font-size:2.2rem">🌍 Quizine</h1>
-        <p class="text-muted">Guess the cuisine — no stakes, all vibes.</p>
+        <p class="text-muted">Guess the cuisine - no stakes, all vibes.</p>
     </div>
 
     <div class="stats-bar" id="stats-bar">
@@ -294,7 +294,7 @@ function handleAnswer(btn, isCorrect, correctCuisine, options) {
 
         const msgs = [
             `🎉 Nailed it! That's ${correctCuisine} cuisine!`,
-            `✅ Correct! ${correctCuisine} — you know your food!`,
+            `✅ Correct! ${correctCuisine} - you know your food!`,
             `🔥 Yes! That's definitely ${correctCuisine}!`,
             `👌 Spot on! ${correctCuisine} is right!`,
         ];
@@ -314,7 +314,7 @@ function handleAnswer(btn, isCorrect, correctCuisine, options) {
             `❌ Not quite! It was ${correctCuisine}.`,
             `😬 Close! The answer was ${correctCuisine}.`,
             `💀 Nope! That dish is from ${correctCuisine} cuisine.`,
-            `🤔 Tricky one — it was ${correctCuisine}!`,
+            `🤔 Tricky one - it was ${correctCuisine}!`,
         ];
         fb.textContent = wrongMsgs[Math.floor(Math.random() * wrongMsgs.length)];
     }
